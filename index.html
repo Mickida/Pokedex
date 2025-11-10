@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokedex</title>
+    <link rel="icon" type="svg" href="/icons/pokeball.svg" />
+    <link rel="stylesheet" href="style/font.css" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="style/standard.css" />
+    <link rel="stylesheet" href="style/detailcard.css" />
+    <link rel="stylesheet" href="style/font.css" />
+  </head>
+
+  <body>
+    <main class="content">
+      <header>
+        <div class="header__brand">
+          <img
+            class="header__pokeball"
+            src="./icons/pokeball.svg"
+            alt="pokéball"
+          />
+          <h1 class="header__title">Pokedex</h1>
+        </div>
+        <input
+          type="text"
+          class="header__search"
+          id="searchInput"
+          placeholder="Search Pokémon..."
+        />
+      </header>
+
+      <section class="pokemon-list" id="pokemonList"></section>
+
+      <button id="loadMoreBtn" class="load-more">Load more</button>
+
+      <footer>
+        <p>&copy; 2023 Pokedex. All rights reserved.</p>
+      </footer>
+    </main>
+    <!-- Modal placeholder for pokemon detail -->
+    <div id="detailModal" class="modal" aria-hidden="true"></div>
+    <script src="scripts/api.js" defer></script>
+    <script src="scripts/template.js" defer></script>
+    <script src="scripts/db.js" defer></script>
+    <script src="scripts/script.js" defer></script>
+  </body>
+</html>
