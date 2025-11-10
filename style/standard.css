@@ -79,6 +79,12 @@ body {
   font-weight: 700;
   color: inherit;
 }
+
+/* Force ID and name to white for better readability regardless of card type */
+.card .card__id,
+.card .card__name {
+  color: #ffffff !important;
+}
 .type-badges {
   margin-top: 6px;
   display: flex;
@@ -171,8 +177,8 @@ body {
   transform: translateY(-2px) scale(1.01);
 }
 .load-more:focus {
-  outline: 3px solid rgba(255, 255, 255, 0.12);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: none;
 }
 
 .modal {
@@ -190,4 +196,77 @@ body {
   color: #fff;
   max-width: 720px;
   margin: auto;
+}
+
+.card.type-grass {
+  background: #439837;
+  color: #fff;
+}
+.card.type-fire {
+  background: #f08030;
+  color: #fff;
+}
+.card.type-water {
+  background: #6890f0;
+  color: #fff;
+}
+.card.type-electric {
+  background: #f8d030;
+  color: #111;
+}
+.card.type-bug {
+  background: #a8b820;
+  color: #111;
+}
+.card.type-normal {
+  background: #a8a878;
+  color: #111;
+}
+.card.type-poison {
+  background: #a040a0;
+  color: #fff;
+}
+.card.type-fairy {
+  background: #ee99ac;
+  color: #111;
+}
+.card.type-fighting {
+  background: #c03028;
+  color: #fff;
+}
+.card.type-psychic {
+  background: #f85888;
+  color: #fff;
+}
+.card.type-rock {
+  background: #b8a038;
+  color: #111;
+}
+.card.type-ground {
+  background: #e0c068;
+  color: #111;
+}
+.card.type-flying {
+  background: #a890f0;
+  color: #111;
+}
+.card.type-ghost {
+  background: #705898;
+  color: #fff;
+}
+.card.type-dark {
+  background: #705848;
+  color: #fff;
+}
+.card.type-steel {
+  background: #b8b8d0;
+  color: #111;
+}
+.card.type-ice {
+  background: #98d8d8;
+  color: #111;
+}
+.card.type-dragon {
+  background: #7038f8;
+  color: #fff;
 }

@@ -1,38 +1,6 @@
 let uiOffset = 0;
 const uiLimit = 20;
 
-const TYPE_COLORS = {
-  grass: "#439837",
-  fire: "#F08030",
-  water: "#6890F0",
-  electric: "#F8D030",
-  bug: "#A8B820",
-  normal: "#A8A878",
-  poison: "#A040A0",
-  fairy: "#EE99AC",
-  fighting: "#C03028",
-  psychic: "#F85888",
-  rock: "#B8A038",
-  ground: "#E0C068",
-  flying: "#A890F0",
-  ghost: "#705898",
-  dark: "#705848",
-  steel: "#B8B8D0",
-  ice: "#98D8D8",
-  dragon: "#7038F8",
-};
-
-// small helpers for colors
-function hexToRgb(hex) {
-  const clean = (hex || "").replace("#", "");
-  const bigint = parseInt(clean, 16);
-  return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
-}
-
-function rgbaStr(rgb, a) {
-  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${a})`;
-}
-
 function createTypeBadge(typeName) {
   const span = document.createElement("span");
   span.className = `type-badge type-${typeName}`;
@@ -51,13 +19,12 @@ function createTypeBadge(typeName) {
 }
 
 function applyCardTypeStyle(cardElement, primaryType) {
-  const color = TYPE_COLORS[primaryType];
-  if (!color) return;
-  const rgb = hexToRgb(color);
-  cardElement.style.background = `linear-gradient(180deg, ${rgbaStr(
-    rgb,
-    0.45
-  )} 0%, ${rgbaStr(rgb, 0.95)} 100%)`;
+  const toRemove = [];
+  cardElement.classList.forEach((c) => {
+    if (c.startsWith("type-")) toRemove.push(c);
+  });
+  toRemove.forEach((c) => cardElement.classList.remove(c));
+  if (primaryType) cardElement.classList.add(`type-${primaryType}`);
 }
 
 function capitalize(str) {
@@ -81,6 +48,8 @@ function createPokemonCard(pokemonSummary) {
     </div>`;
   return article;
 }
+
+// (modal code removed)
 
 async function enrichCardWithTypes(cardElement, pokemonId) {
   try {
