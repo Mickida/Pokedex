@@ -1,3 +1,4 @@
+/* (preloader styles removed) */
 body {
   background-color: #06151d;
   margin: 0;
@@ -24,4 +25,54 @@ footer {
   width: 100%;
   bottom: 0;
   font-weight: bold;
+}
+
+/* Search input styling */
+.header__search {
+  width: 240px;
+  max-width: 45%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  outline: none;
+}
+.header__search::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* suggestion dropdown under the search input */
+.search-suggestions {
+  position: absolute;
+  z-index: 1500;
+  display: none;
+  background: #082029;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  padding: 6px;
+  min-width: 220px;
+  box-sizing: border-box;
+}
+.search-suggestion {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  background: transparent;
+  color: #e6f7ff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.search-suggestion:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.search-suggestion:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ensure suggestion box positions nicely relative to header */
+header {
+  position: relative;
 }

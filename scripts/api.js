@@ -31,6 +31,7 @@ async function getPokemon(idOrName) {
   const pokemonData = await loadData(`/pokemon/${idOrName}`);
   const officialArtworkUrl =
     pokemonData.sprites?.other?.["official-artwork"]?.front_default;
+
   return {
     id: pokemonData.id,
     name: pokemonData.name,
@@ -40,6 +41,8 @@ async function getPokemon(idOrName) {
     abilities: pokemonData.abilities,
     height: pokemonData.height,
     weight: pokemonData.weight,
+    moves: pokemonData.moves, // full move objects from API
+    species: pokemonData.species, // contains name and url for species data
   };
 }
 

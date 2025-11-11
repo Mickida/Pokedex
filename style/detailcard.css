@@ -1,0 +1,347 @@
+/* Modal card styles: 1/3 colored top, 2/3 white bottom, portrait orientation */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 4000;
+  align-items: center;
+  justify-content: center;
+}
+.modal.open {
+  display: flex;
+}
+
+.modal-card {
+  width: 360px;
+  max-width: 92vw;
+  height: 540px;
+  max-height: 92vh;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  position: relative;
+}
+
+/* Top smaller, Bottom larger so Stats have more room */
+.card-top {
+  /* reduce colored top so bottom gets more vertical space */
+  flex: 0 0 24%;
+  /* header area slightly tighter so title/ID/button align nicely */
+  padding: 10px 14px 6px 14px;
+  color: #fff;
+  display: flex;
+  position: relative;
+}
+.card-bottom {
+  /* give the bottom (panels) most of the height */
+  flex: 0 0 76%;
+  background: #fff;
+  color: #222;
+  display: flex;
+  align-items: flex-start;
+  position: relative; /* allow absolutely positioned nav inside */
+}
+
+/* Close button sits on top-right of the colored area */
+.modal-close {
+  position: absolute;
+  top: 12px; /* align with title/id */
+  right: 12px;
+  z-index: 12;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+}
+.modal-close:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.18);
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+.modal-close:active {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Layout: ID top-left, name centered (like non-modal cards) */
+.top-inner {
+  display: block;
+  width: 100%;
+  position: relative;
+  min-height: 36px; /* reserve space for the header row */
+}
+.id-wrap {
+  position: absolute;
+  left: 12px;
+  top: 12px; /* align with title and close button */
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+.title-wrap {
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.title-wrap h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #fff;
+  font-weight: 700;
+}
+.modal-type-badges {
+  /* position badges under the ID (left column) */
+  position: absolute;
+  left: 4px; /* align with .id-wrap */
+  top: 40px; /* place below the ID text */
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+/* image placed inside bottom right area but visually overlapping; size limited */
+.card-body {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* keep bottom fixed; make inner content scroll when needed */
+}
+.top-inner .detail-image-wrap {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 36px; /* raise the image into the colored header */
+  width: 128px;
+  height: 128px;
+  z-index: 3;
+  pointer-events: none;
+}
+.top-inner .detail-image-wrap img,
+.top-inner .detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.detail-content {
+  flex: 1;
+  padding: 24px;
+}
+
+/* About grid (two-column list) */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  align-items: start;
+  padding-top: 20px;
+}
+.about-grid div {
+  line-height: 1.6;
+}
+
+/* Compact Stats: small label/value row with a thin, visible bar below */
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  gap: 3px; /* etwas mehr horizontal/vertical breathing */
+  align-items: center;
+  margin: 10px 0; /* mehr Abstand zwischen den Stat-Zeilen */
+}
+.stat-label {
+  text-transform: capitalize;
+  color: #666;
+  font-size: 16px;
+  line-height: 1.05;
+}
+.stat-value {
+  font-weight: 700;
+  text-align: right;
+  font-size: 16px;
+}
+.stat-bar {
+  grid-column: 1 / -1;
+  height: 4px; /* leicht erhöhte Balkenhöhe für bessere Sichtbarkeit */
+  background: #f3f3f3;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px; /* etwas mehr space above the bar */
+}
+.stat-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e85b5b, #e85b5b);
+  width: var(--stat-pct, 0%);
+  transition: width 200ms ease;
+}
+
+/* Moves removed — no moves-specific styles required */
+
+/* Modal navigation (prev/next) positioned at the top of the white panel */
+.modal-nav {
+  position: absolute;
+  top: 350px; /* sit slightly above the white panel */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 6;
+}
+.nav-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: none;
+  background: rgba(209, 209, 209, 0.95);
+  color: #333;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+.nav-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+}
+.nav-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 420px) {
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+}
+
+.detail-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.detail-tabs [role="tab"] {
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  color: #6b6b6b;
+  cursor: pointer;
+}
+.detail-tabs [role="tab"][aria-selected="true"] {
+  color: var(--accent, #2b7a78);
+  border-bottom: 3px solid var(--accent, #2b7a78);
+  font-weight: 700;
+}
+
+.detail-panels {
+  overflow: auto;
+  max-height: none;
+}
+.detail-panels section {
+  padding: 6px 0;
+}
+
+.modal-card.type-grass .card-top {
+  background: #2e7e23;
+}
+.modal-card.type-fire .card-top {
+  background: #f08030;
+}
+.modal-card.type-water .card-top {
+  background: #6890f0;
+}
+.modal-card.type-electric .card-top {
+  background: #f8d030;
+}
+.modal-card.type-bug .card-top {
+  background: #a8b820;
+}
+.modal-card.type-normal .card-top {
+  background: #a8a878;
+}
+.modal-card.type-poison .card-top {
+  background: #a040a0;
+}
+.modal-card.type-fairy .card-top {
+  background: #ee99ac;
+}
+.modal-card.type-fighting .card-top {
+  background: #c03028;
+}
+.modal-card.type-psychic .card-top {
+  background: #f85888;
+}
+.modal-card.type-rock .card-top {
+  background: #b8a038;
+}
+.modal-card.type-ground .card-top {
+  background: #e0c068;
+}
+.modal-card.type-flying .card-top {
+  background: #a890f0;
+}
+.modal-card.type-ghost .card-top {
+  background: #705898;
+}
+.modal-card.type-dark .card-top {
+  background: #705848;
+}
+.modal-card.type-steel .card-top {
+  background: #b8b8d0;
+}
+.modal-card.type-ice .card-top {
+  background: #98d8d8;
+}
+.modal-card.type-dragon .card-top {
+  background: #7038f8;
+}
+
+/* responsive: narrower screens use taller but narrower card */
+@media (max-width: 420px) {
+  .modal-card {
+    width: 320px;
+    height: 520px;
+  }
+  .top-inner .detail-image-wrap {
+    width: 120px;
+    height: 120px;
+    top: 72px;
+  }
+  .detail-tabs {
+    margin-top: 64px;
+  }
+}
+
+/* responsive: narrower screens use taller but narrower card */
+@media (max-width: 420px) {
+  .modal-card {
+    width: 320px;
+    height: 520px;
+  }
+  .top-inner .detail-image-wrap {
+    width: 120px;
+    height: 120px;
+    top: 80px;
+  }
+}
