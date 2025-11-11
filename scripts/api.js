@@ -1,5 +1,4 @@
 const API_BASE = "https://pokeapi.co/api/v2";
-const API_URL = `${API_BASE}/pokemon/`;
 const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork";
 
@@ -45,13 +44,8 @@ async function getPokemon(idOrName) {
 function getPokemonById(id) {
   return getPokemon(id);
 }
-function getPokemonByName(name) {
-  return getPokemon(name);
-}
-
 window.pokeApi = {
   getPokemonList,
   getPokemonById,
-  getPokemonByName,
   getPokemon,
 };

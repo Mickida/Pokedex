@@ -1,7 +1,10 @@
-/* (preloader styles removed) */
+html,
 body {
-  background-color: #06151d;
+  height: 100%;
   margin: 0;
+  font-family: var(--app-font);
+  background: #06151d;
+  color: #fff;
 }
 
 header {
@@ -14,6 +17,18 @@ header {
   justify-content: space-between;
   padding: 12px 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+footer {
+  background-color: #082029;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  font-weight: bold;
+  z-index: 1000;
 }
 
 .main-body {
@@ -52,85 +67,10 @@ header {
   animation: spinner-rotate 900ms linear infinite;
 }
 
-.global-spinner {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: #06151d;
-  z-index: 4000;
-}
-.global-spinner[aria-hidden="false"] {
-  display: flex;
-}
-.global-spinner .spinner {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  border: 10px solid rgba(255, 255, 255, 0.06);
-  border-top-color: #e6f7ff;
-  animation: spinner-rotate 900ms linear infinite;
-}
 @keyframes spinner-rotate {
   to {
     transform: rotate(360deg);
   }
-}
-
-.load-more {
-  position: relative;
-}
-.load-more .btn-spinner {
-  display: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.16);
-  border-top-color: #fff;
-  box-sizing: border-box;
-  position: relative;
-  vertical-align: middle;
-}
-.load-more.loading .btn-text {
-  visibility: hidden;
-}
-.load-more.loading .btn-spinner {
-  display: inline-block;
-  animation: spinner-rotate 900ms linear infinite;
-}
-.btn-spinner img,
-.btn-spinner > svg {
-  width: 18px;
-  height: auto;
-  display: inline-block;
-  animation: spinner-rotate 900ms linear infinite;
-}
-
-footer {
-  background-color: #082029;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  position: fixed;
-  width: 100%;
-  bottom: 0;
-  font-weight: bold;
-  z-index: 1000;
-}
-
-.header__search {
-  width: 240px;
-  max-width: 45%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  color: #fff;
-  outline: none;
-}
-.header__search::placeholder {
-  color: rgba(255, 255, 255, 0.5);
 }
 
 .search-suggestions {

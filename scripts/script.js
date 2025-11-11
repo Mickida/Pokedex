@@ -1,6 +1,14 @@
 let uiOffset = 0;
 const uiLimit = 20;
 
+// ---------------------
+// Utilities
+// ---------------------
+function capitalize(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function createTypeBadge(typeName) {
   const span = document.createElement("span");
   span.className = `type-badge type-${typeName}`;
@@ -27,11 +35,9 @@ function applyCardTypeStyle(cardElement, primaryType) {
   if (primaryType) cardElement.classList.add(`type-${primaryType}`);
 }
 
-function capitalize(str) {
-  if (!str) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
+// ---------------------
+// Card rendering
+// ---------------------
 function createPokemonCard(pokemonSummary) {
   const article = document.createElement("article");
   article.className = "card";
@@ -40,58 +46,24 @@ function createPokemonCard(pokemonSummary) {
     if (e.target && e.target.closest(".type-badges")) return;
     openDetailModalById(pokemonSummary.id);
   });
-  article.innerHTML = `
-    <div class="card__header">
-      <span class="card__id">#${pokemonSummary.id}</span>
-      <h3 class="card__name">${capitalize(pokemonSummary.name)}</h3>
-    </div>
-    <div class="card__media"><img src="${
-      pokemonSummary.image
-    }" alt="${capitalize(pokemonSummary.name)}"></div>
-    <div class="card__body">
-      <div class="type-badges" data-id="${pokemonSummary.id}"></div>
-    </div>`;
+  const rendered = window.templates.renderCard({
+    id: pokemonSummary.id,
+    image: pokemonSummary.image,
+    name: capitalize(pokemonSummary.name),
+  });
+  article.innerHTML = rendered;
   return article;
 }
 
+// ---------------------
+// Modal / detail view
+// ---------------------
 function buildModalIfNeeded() {
   const root = document.getElementById("detailModal");
   if (!root) return null;
   if (root.dataset.built) return root;
-
   root.setAttribute("aria-hidden", "true");
-  root.innerHTML = `
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <button class="modal-close" aria-label="Close">×</button>
-      <div class="card-top">
-        <div class="top-inner">
-          <div class="title-wrap">
-            <h2 id="modalTitle">Name</h2>
-          </div>
-          <div class="id-wrap">#000</div>
-          <div class="modal-type-badges"></div>
-          <div class="detail-image-wrap"><img class="detail-image" src="" alt=""></div>
-        </div>
-      </div>
-      <div class="card-bottom">
-        <div class="card-body">
-          <div class="detail-content">
-            <div class="detail-tabs" role="tablist">
-              <button role="tab" data-tab="overview" aria-selected="true">About</button>
-              <button role="tab" data-tab="stats">Stats</button>
-            </div>
-            <div class="detail-panels">
-              <section data-panel="overview" role="tabpanel">Loading...</section>
-              <section data-panel="stats" role="tabpanel" hidden></section>
-            </div>
-          </div>
-        </div>
-        <div class="modal-nav" aria-hidden="true">
-          <button class="nav-btn nav-prev" aria-label="Previous">‹</button>
-          <button class="nav-btn nav-next" aria-label="Next">›</button>
-        </div>
-      </div>
-    </div>`;
+  root.innerHTML = window.templates.renderModal();
 
   root.dataset.built = "1";
 
@@ -167,38 +139,10 @@ function showModal(detail) {
   updateNavButtons(root);
 
   const overview = root.querySelector('[data-panel="overview"]');
-  const speciesName =
-    detail.species && detail.species.name
-      ? capitalize(detail.species.name)
-      : "-";
-  overview.innerHTML = `
-    <div class="about-grid">
-      <div><strong>Species</strong></div><div>${speciesName}</div>
-      <div><strong>Height</strong></div><div>${detail.height}</div>
-      <div><strong>Weight</strong></div><div>${detail.weight}</div>
-      <div><strong>Abilities</strong></div><div>${(detail.abilities || [])
-        .map((a) => a.ability.name)
-        .join(", ")}</div>
-    </div>
-  `;
+  overview.innerHTML = window.templates.renderOverview(detail);
 
   const stats = root.querySelector('[data-panel="stats"]');
-  const maxStat = 160;
-  stats.innerHTML = (detail.stats || [])
-    .map((s) => {
-      const val = s.base_stat || 0;
-      const pct = Math.min(100, Math.round((val / maxStat) * 100));
-      return `
-      <div class="stat-row">
-        <div class="stat-label">${s.stat.name}</div>
-        <div class="stat-value">${val}</div>
-        <div class="stat-bar">
-          <div class="stat-fill" style="width:${pct}%"></div>
-        </div>
-      </div>
-    `;
-    })
-    .join("");
+  stats.innerHTML = window.templates.renderStats(detail);
 
   root.querySelector(".modal-close").focus();
 }
@@ -264,6 +208,9 @@ function updateNavButtons(root) {
   if (nextBtn) nextBtn.disabled = idx === -1 || idx >= ids.length - 1;
 }
 
+// ---------------------
+// Data loading / enrichment
+// ---------------------
 async function enrichCardWithTypes(cardElement, pokemonId) {
   try {
     const detail = await pokeApi.getPokemonById(pokemonId);
@@ -290,6 +237,9 @@ async function loadAndRenderPage() {
   uiOffset += uiLimit;
 }
 
+// ---------------------
+// Spinner / loading helpers
+// ---------------------
 function showMainSpinner() {
   const g = document.getElementById("mainSpinner");
   if (!g) return;
@@ -316,38 +266,10 @@ function setButtonLoading(btn, isLoading) {
 }
 
 const PRELOADER_MS = 2500;
-document.addEventListener("DOMContentLoaded", async () => {
-  showMainSpinner();
-  try {
-    const loadPromise = loadAndRenderPage();
-    const timerPromise = new Promise((res) => setTimeout(res, PRELOADER_MS));
-    await Promise.all([loadPromise, timerPromise]);
-  } catch (e) {
-    console.warn("initial load failed", e);
-  } finally {
-    hideMainSpinner();
-  }
 
-  const loadBtn = document.getElementById("loadMoreBtn");
-  if (loadBtn) {
-    loadBtn.addEventListener("click", async (ev) => {
-      try {
-        showMainSpinner();
-        setButtonLoading(loadBtn, true);
-        const timerPromise = new Promise((res) =>
-          setTimeout(res, PRELOADER_MS)
-        );
-        await Promise.all([loadAndRenderPage(), timerPromise]);
-      } catch (e) {
-        console.warn("load more failed", e);
-      } finally {
-        setButtonLoading(loadBtn, false);
-        hideMainSpinner();
-      }
-    });
-  }
-});
-
+// ---------------------
+// Search / filtering helpers
+// ---------------------
 function getRenderedCards() {
   const container = document.getElementById("pokemonList");
   if (!container) return [];
@@ -415,7 +337,43 @@ function showSearchSuggestions(q) {
   container.style.display = "block";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+// ---------------------
+// DOM Ready: initialize loader, buttons and search
+// ---------------------
+document.addEventListener("DOMContentLoaded", async () => {
+  // Initial loader + first page
+  showMainSpinner();
+  try {
+    const loadPromise = loadAndRenderPage();
+    const timerPromise = new Promise((res) => setTimeout(res, PRELOADER_MS));
+    await Promise.all([loadPromise, timerPromise]);
+  } catch (e) {
+    console.warn("initial load failed", e);
+  } finally {
+    hideMainSpinner();
+  }
+
+  // Load more button
+  const loadBtn = document.getElementById("loadMoreBtn");
+  if (loadBtn) {
+    loadBtn.addEventListener("click", async (ev) => {
+      try {
+        showMainSpinner();
+        setButtonLoading(loadBtn, true);
+        const timerPromise = new Promise((res) =>
+          setTimeout(res, PRELOADER_MS)
+        );
+        await Promise.all([loadAndRenderPage(), timerPromise]);
+      } catch (e) {
+        console.warn("load more failed", e);
+      } finally {
+        setButtonLoading(loadBtn, false);
+        hideMainSpinner();
+      }
+    });
+  }
+
+  // Search input & suggestions setup
   const header = document.querySelector("header");
   const input = document.getElementById("searchInput");
   if (!input || !header) return;
@@ -437,6 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sug.style.top = top + "px";
     sug.style.width = Math.max(0, Math.round(rect.width)) + "px";
   }
+
   positionSuggestions();
   window.addEventListener("resize", positionSuggestions);
   window.addEventListener("orientationchange", positionSuggestions);

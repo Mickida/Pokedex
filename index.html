@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pokedex</title>
     <link rel="icon" type="svg" href="/icons/pokeball.svg" />
+    <!-- Fonts and base styles -->
     <link rel="stylesheet" href="style/font.css" />
-    <link rel="stylesheet" href="style/style.css" />
+    <!-- canonical shared UI rules (cards, header, load-more) -->
     <link rel="stylesheet" href="style/standard.css" />
+    <!-- modal / detail view styles -->
     <link rel="stylesheet" href="style/detailcard.css" />
-    <link rel="stylesheet" href="style/font.css" />
+    <!-- local overrides and small utilities -->
+    <link rel="stylesheet" href="style/style.css" />
   </head>
 
   <body>
@@ -51,7 +54,6 @@
     <div id="detailModal" class="modal" aria-hidden="true"></div>
     <script src="scripts/api.js" defer></script>
     <script src="scripts/template.js" defer></script>
-    <script src="scripts/db.js" defer></script>
     <script src="scripts/script.js" defer></script>
   </body>
 </html>

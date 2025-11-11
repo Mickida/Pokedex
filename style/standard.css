@@ -1,12 +1,3 @@
-html,
-body {
-  height: 100%;
-  margin: 0;
-  font-family: var(--app-font);
-  background: #06151d;
-  color: #fff;
-}
-
 #pokemonList {
   display: flex;
   flex-wrap: wrap;
@@ -185,6 +176,9 @@ body {
   background: rgba(0, 0, 0, 0.6);
   align-items: center;
   justify-content: center;
+}
+.modal.open {
+  display: flex;
 }
 .modal-inner {
   background: #07262a;
