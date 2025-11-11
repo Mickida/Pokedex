@@ -8,7 +8,6 @@ body {
 }
 
 #pokemonList {
-  /* use flex so rows with fewer cards are centered instead of left-aligned */
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -80,7 +79,6 @@ body {
   color: inherit;
 }
 
-/* Force ID and name to white for better readability regardless of card type */
 .card .card__id,
 .card .card__name {
   color: #ffffff !important;
@@ -123,7 +121,6 @@ body {
   font-size: 28px;
 }
 
-/* search input in header */
 .header__search {
   min-width: 220px;
   max-width: 440px;

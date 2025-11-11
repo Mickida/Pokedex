@@ -36,9 +36,7 @@ function createPokemonCard(pokemonSummary) {
   const article = document.createElement("article");
   article.className = "card";
   article.dataset.id = pokemonSummary.id;
-  // open modal on click
   article.addEventListener("click", (e) => {
-    // ignore clicks on badge icons
     if (e.target && e.target.closest(".type-badges")) return;
     openDetailModalById(pokemonSummary.id);
   });
@@ -56,7 +54,6 @@ function createPokemonCard(pokemonSummary) {
   return article;
 }
 
-// --- Modal: build/open/close ---
 function buildModalIfNeeded() {
   const root = document.getElementById("detailModal");
   if (!root) return null;
@@ -98,7 +95,6 @@ function buildModalIfNeeded() {
 
   root.dataset.built = "1";
 
-  // handlers
   root.querySelector(".modal-close").addEventListener("click", closeModal);
   root.addEventListener("click", (ev) => {
     if (ev.target === root) closeModal();
@@ -107,7 +103,6 @@ function buildModalIfNeeded() {
     if (ev.key === "Escape") closeModal();
   });
 
-  // tab clicks
   const tablist = root.querySelector(".detail-tabs");
   tablist.addEventListener("click", (ev) => {
     const btn = ev.target.closest('[role="tab"]');
@@ -115,7 +110,6 @@ function buildModalIfNeeded() {
     switchTab(btn.dataset.tab, root);
   });
 
-  // nav button clicks (prev / next)
   const prevBtn = root.querySelector(".nav-prev");
   const nextBtn = root.querySelector(".nav-next");
   if (prevBtn && nextBtn) {
@@ -148,15 +142,12 @@ function showModal(detail) {
   root.setAttribute("aria-hidden", "false");
 
   const card = root.querySelector(".modal-card");
-  // set title/id
   root.querySelector("#modalTitle").textContent = capitalize(detail.name);
   root.querySelector(".id-wrap").textContent = `#${detail.id}`;
-  // image
   const img = root.querySelector(".detail-image");
   img.src = detail.image || "";
   img.alt = capitalize(detail.name) || "";
 
-  // set modal color class by primary type
   const primaryType =
     detail.types &&
     detail.types[0] &&
@@ -164,21 +155,17 @@ function showModal(detail) {
     detail.types[0].type.name
       ? detail.types[0].type.name
       : null;
-  // clear previous type- on card
   card.className = "modal-card";
   if (primaryType) card.classList.add(`type-${primaryType}`);
 
-  // render type badges in top area
   const topBadges = root.querySelector(".modal-type-badges");
   topBadges.innerHTML = "";
   (detail.types || []).forEach((t) =>
     topBadges.appendChild(createTypeBadge(t.type.name))
   );
 
-  // update nav button disabled state
   updateNavButtons(root);
 
-  // populate basic panels
   const overview = root.querySelector('[data-panel="overview"]');
   const speciesName =
     detail.species && detail.species.name
@@ -196,8 +183,7 @@ function showModal(detail) {
   `;
 
   const stats = root.querySelector('[data-panel="stats"]');
-  // create stat bars
-  const maxStat = 160; // visual scale
+  const maxStat = 160;
   stats.innerHTML = (detail.stats || [])
     .map((s) => {
       const val = s.base_stat || 0;
@@ -213,9 +199,7 @@ function showModal(detail) {
     `;
     })
     .join("");
-  // Evolution chain removed — nothing to render here
 
-  // focus
   root.querySelector(".modal-close").focus();
 }
 
@@ -242,7 +226,6 @@ function switchTab(tabName, root) {
   });
 }
 
-// --- modal navigation helpers ---
 function getLoadedIds() {
   const cards = Array.from(document.querySelectorAll("#pokemonList .card"));
   return cards.map((c) => parseInt(c.dataset.id, 10)).filter((n) => !isNaN(n));
@@ -290,7 +273,6 @@ async function enrichCardWithTypes(cardElement, pokemonId) {
     const types = (detail.types || []).map((t) => t.type.name);
     types.forEach((typeName) => badges.appendChild(createTypeBadge(typeName)));
 
-    // apply primary type styling (if any)
     if (types.length > 0) applyCardTypeStyle(cardElement, types[0]);
   } catch (e) {
     console.warn("type load failed", e);
@@ -308,13 +290,64 @@ async function loadAndRenderPage() {
   uiOffset += uiLimit;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadAndRenderPage();
+function showMainSpinner() {
+  const g = document.getElementById("mainSpinner");
+  if (!g) return;
+  console.log("showMainSpinner: showing main spinner");
+  g.setAttribute("aria-hidden", "false");
+  g.style.display = "flex";
+}
+function hideMainSpinner() {
+  const g = document.getElementById("mainSpinner");
+  if (!g) return;
+  console.log("hideMainSpinner: hiding main spinner");
+  g.setAttribute("aria-hidden", "true");
+  g.style.display = "none";
+}
+function setButtonLoading(btn, isLoading) {
+  if (!btn) return;
+  if (isLoading) {
+    btn.classList.add("loading");
+    btn.disabled = true;
+  } else {
+    btn.classList.remove("loading");
+    btn.disabled = false;
+  }
+}
+
+const PRELOADER_MS = 2500;
+document.addEventListener("DOMContentLoaded", async () => {
+  showMainSpinner();
+  try {
+    const loadPromise = loadAndRenderPage();
+    const timerPromise = new Promise((res) => setTimeout(res, PRELOADER_MS));
+    await Promise.all([loadPromise, timerPromise]);
+  } catch (e) {
+    console.warn("initial load failed", e);
+  } finally {
+    hideMainSpinner();
+  }
+
   const loadBtn = document.getElementById("loadMoreBtn");
-  if (loadBtn) loadBtn.addEventListener("click", loadAndRenderPage);
+  if (loadBtn) {
+    loadBtn.addEventListener("click", async (ev) => {
+      try {
+        showMainSpinner();
+        setButtonLoading(loadBtn, true);
+        const timerPromise = new Promise((res) =>
+          setTimeout(res, PRELOADER_MS)
+        );
+        await Promise.all([loadAndRenderPage(), timerPromise]);
+      } catch (e) {
+        console.warn("load more failed", e);
+      } finally {
+        setButtonLoading(loadBtn, false);
+        hideMainSpinner();
+      }
+    });
+  }
 });
 
-// --- Search / Filter helpers ---
 function getRenderedCards() {
   const container = document.getElementById("pokemonList");
   if (!container) return [];
@@ -371,12 +404,10 @@ function showSearchSuggestions(q) {
     btn.textContent = `${m.name}`;
     btn.dataset.id = m.id;
     btn.addEventListener("click", (ev) => {
-      // set input, clear suggestions, open modal for that pokemon
       const input = document.getElementById("searchInput");
       if (input) input.value = m.name;
       container.innerHTML = "";
       container.style.display = "none";
-      // open detail if id available
       if (m.id) openDetailModalById(m.id);
     });
     container.appendChild(btn);
@@ -384,40 +415,31 @@ function showSearchSuggestions(q) {
   container.style.display = "block";
 }
 
-// wire the input: create suggestion container and attach handlers
 document.addEventListener("DOMContentLoaded", () => {
   const header = document.querySelector("header");
   const input = document.getElementById("searchInput");
   if (!input || !header) return;
 
-  // create suggestion box directly under header input
   let sug = document.getElementById("searchSuggestions");
   if (!sug) {
     sug = document.createElement("div");
     sug.id = "searchSuggestions";
     sug.className = "search-suggestions";
-    // insert after input
     input.insertAdjacentElement("afterend", sug);
   }
 
-  // position suggestions directly under the input and match its width
   function positionSuggestions() {
     const rect = input.getBoundingClientRect();
     const headerRect = header.getBoundingClientRect();
-    // since header is positioned relative, compute offsets relative to header
     const left = rect.left - headerRect.left;
-    const top = rect.top - headerRect.top + input.offsetHeight + 6; // small gap
+    const top = rect.top - headerRect.top + input.offsetHeight + 6;
     sug.style.left = left + "px";
     sug.style.top = top + "px";
-    // use bounding rect width so fractional pixels and transforms match the visible input width
     sug.style.width = Math.max(0, Math.round(rect.width)) + "px";
   }
-  // initial position
   positionSuggestions();
-  // reposition on resize and scroll (viewport changes)
   window.addEventListener("resize", positionSuggestions);
   window.addEventListener("orientationchange", positionSuggestions);
-  // also reposition when the input gains focus (in case layout shifted)
   input.addEventListener("focus", positionSuggestions);
 
   input.setAttribute("aria-autocomplete", "list");
@@ -429,7 +451,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showSearchSuggestions(q);
   });
 
-  // hide suggestions when clicking outside
   document.addEventListener("click", (ev) => {
     if (!sug) return;
     if (ev.target === input) return;

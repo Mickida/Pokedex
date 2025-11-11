@@ -1,4 +1,3 @@
-/* Modal card styles: 1/3 colored top, 2/3 white bottom, portrait orientation */
 .modal {
   display: none;
   position: fixed;
@@ -26,30 +25,25 @@
   position: relative;
 }
 
-/* Top smaller, Bottom larger so Stats have more room */
 .card-top {
-  /* reduce colored top so bottom gets more vertical space */
   flex: 0 0 24%;
-  /* header area slightly tighter so title/ID/button align nicely */
   padding: 10px 14px 6px 14px;
   color: #fff;
   display: flex;
   position: relative;
 }
 .card-bottom {
-  /* give the bottom (panels) most of the height */
   flex: 0 0 76%;
   background: #fff;
   color: #222;
   display: flex;
   align-items: flex-start;
-  position: relative; /* allow absolutely positioned nav inside */
+  position: relative;
 }
 
-/* Close button sits on top-right of the colored area */
 .modal-close {
   position: absolute;
-  top: 12px; /* align with title/id */
+  top: 12px;
   right: 12px;
   z-index: 12;
   width: 40px;
@@ -80,17 +74,16 @@
   background: rgba(255, 255, 255, 0.14);
 }
 
-/* Layout: ID top-left, name centered (like non-modal cards) */
 .top-inner {
   display: block;
   width: 100%;
   position: relative;
-  min-height: 36px; /* reserve space for the header row */
+  min-height: 36px;
 }
 .id-wrap {
   position: absolute;
   left: 12px;
-  top: 12px; /* align with title and close button */
+  top: 12px;
   font-size: 18px;
   font-weight: 700;
   color: #fff;
@@ -109,27 +102,25 @@
   font-weight: 700;
 }
 .modal-type-badges {
-  /* position badges under the ID (left column) */
   position: absolute;
-  left: 4px; /* align with .id-wrap */
-  top: 40px; /* place below the ID text */
+  left: 4px;
+  top: 40px;
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
 }
 
-/* image placed inside bottom right area but visually overlapping; size limited */
 .card-body {
   display: flex;
   width: 100%;
   height: 100%;
-  overflow: auto; /* keep bottom fixed; make inner content scroll when needed */
+  overflow: auto;
 }
 .top-inner .detail-image-wrap {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  top: 36px; /* raise the image into the colored header */
+  top: 36px;
   width: 128px;
   height: 128px;
   z-index: 3;
@@ -147,7 +138,6 @@
   padding: 24px;
 }
 
-/* About grid (two-column list) */
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -159,13 +149,12 @@
   line-height: 1.6;
 }
 
-/* Compact Stats: small label/value row with a thin, visible bar below */
 .stat-row {
   display: grid;
   grid-template-columns: 1fr 44px;
-  gap: 3px; /* etwas mehr horizontal/vertical breathing */
+  gap: 3px;
   align-items: center;
-  margin: 10px 0; /* mehr Abstand zwischen den Stat-Zeilen */
+  margin: 10px 0;
 }
 .stat-label {
   text-transform: capitalize;
@@ -180,11 +169,11 @@
 }
 .stat-bar {
   grid-column: 1 / -1;
-  height: 4px; /* leicht erhöhte Balkenhöhe für bessere Sichtbarkeit */
+  height: 4px;
   background: #f3f3f3;
   border-radius: 4px;
   overflow: hidden;
-  margin-top: 8px; /* etwas mehr space above the bar */
+  margin-top: 8px;
 }
 .stat-fill {
   height: 100%;
@@ -193,12 +182,9 @@
   transition: width 200ms ease;
 }
 
-/* Moves removed — no moves-specific styles required */
-
-/* Modal navigation (prev/next) positioned at the top of the white panel */
 .modal-nav {
   position: absolute;
-  top: 350px; /* sit slightly above the white panel */
+  top: 350px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -317,7 +303,6 @@
   background: #7038f8;
 }
 
-/* responsive: narrower screens use taller but narrower card */
 @media (max-width: 420px) {
   .modal-card {
     width: 320px;
@@ -333,7 +318,6 @@
   }
 }
 
-/* responsive: narrower screens use taller but narrower card */
 @media (max-width: 420px) {
   .modal-card {
     width: 320px;

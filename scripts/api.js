@@ -1,17 +1,14 @@
-// Minimal, easy-to-read PokeAPI helper (option A)
 const API_BASE = "https://pokeapi.co/api/v2";
 const API_URL = `${API_BASE}/pokemon/`;
 const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork";
 
-// einfacher fetch-wrapper im Lernstil
 async function loadData(path = "") {
   const res = await fetch(API_BASE + path);
   if (!res.ok) throw new Error("Network error " + res.status);
   return await res.json();
 }
 
-// Liste: gibt array mit {name,id,image}
 async function getPokemonList(offset = 0, limit = 20) {
   const listResponse = await loadData(
     `/pokemon?offset=${offset}&limit=${limit}`
@@ -26,7 +23,6 @@ async function getPokemonList(offset = 0, limit = 20) {
   });
 }
 
-// Detail: vereinfachtes Objekt
 async function getPokemon(idOrName) {
   const pokemonData = await loadData(`/pokemon/${idOrName}`);
   const officialArtworkUrl =
@@ -41,8 +37,8 @@ async function getPokemon(idOrName) {
     abilities: pokemonData.abilities,
     height: pokemonData.height,
     weight: pokemonData.weight,
-    moves: pokemonData.moves, // full move objects from API
-    species: pokemonData.species, // contains name and url for species data
+    moves: pokemonData.moves,
+    species: pokemonData.species,
   };
 }
 
@@ -53,7 +49,6 @@ function getPokemonByName(name) {
   return getPokemon(name);
 }
 
-// Expose a small API object for the UI scripts to call
 window.pokeApi = {
   getPokemonList,
   getPokemonById,

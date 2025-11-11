@@ -31,9 +31,17 @@
         />
       </header>
 
-      <section class="pokemon-list" id="pokemonList"></section>
+      <div class="main-body">
+        <div id="mainSpinner" class="main-spinner" aria-hidden="true">
+          <div class="spinner" role="status" aria-label="Loading">
+            <img src="./icons/pokeball.svg" alt="loading" class="spinner-img" />
+          </div>
+        </div>
 
-      <button id="loadMoreBtn" class="load-more">Load more</button>
+        <section class="pokemon-list" id="pokemonList"></section>
+
+        <button id="loadMoreBtn" class="load-more">Load more</button>
+      </div>
 
       <footer>
         <p>&copy; 2023 Pokedex. All rights reserved.</p>
