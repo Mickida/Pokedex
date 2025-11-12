@@ -309,12 +309,14 @@ function showMainSpinner() {
   g.setAttribute("aria-hidden", "false");
   g.style.display = "flex";
 }
+
 function hideMainSpinner() {
   const g = document.getElementById("mainSpinner");
   if (!g) return;
   g.setAttribute("aria-hidden", "true");
   g.style.display = "none";
 }
+
 function setButtonLoading(btn, isLoading) {
   if (!btn) return;
   if (isLoading) {
