@@ -168,22 +168,8 @@ function showModal(detail) {
 function setModalHeader(root, detail) {
   const card = root.querySelector(".modal-card");
   if (!card) return;
-  const title = root.querySelector("#modalTitle");
-  if (title) title.textContent = capitalize(detail.name);
-  const idWrap = root.querySelector(".id-wrap");
-  if (idWrap) idWrap.textContent = `#${detail.id}`;
-  const img = root.querySelector(".detail-image");
-  if (img) {
-    img.src = detail.image || "";
-    img.alt = capitalize(detail.name) || "";
-  }
-  const primaryType =
-    detail.types &&
-    detail.types[0] &&
-    detail.types[0].type &&
-    detail.types[0].type.name
-      ? detail.types[0].type.name
-      : null;
+  setModalImageTitleId(root, detail);
+  const primaryType = getPrimaryType(detail);
   card.className = "modal-card";
   if (primaryType) card.classList.add(`type-${primaryType}`);
 }
@@ -236,10 +222,8 @@ function switchTab(tabName, root) {
 
 function getLoadedIds() {
   const cards = Array.from(document.querySelectorAll("#pokemonList .card"));
-  // Only return ids of cards that are visible (not display:none)
   return cards
     .filter((c) => {
-      // check computed style so inline or stylesheet hiding both count
       try {
         const style = window.getComputedStyle(c);
         return (
@@ -354,18 +338,19 @@ function filterCardsByName(q) {
   const query = (q || "").trim().toLowerCase();
   const cards = getRenderedCards();
   if (!query) {
-    for (let i = 0; i < cards.length; i++) {
-      cards[i].style.display = "";
-    }
+    showAllCards(cards);
     return;
   }
   for (let i = 0; i < cards.length; i++) {
     const c = cards[i];
-    const nameEl = c.querySelector(".card__name");
-    const name = nameEl ? (nameEl.textContent || "").toLowerCase() : "";
+    const name = getNameFromCard(c).toLowerCase();
     if (name.includes(query)) c.style.display = "";
     else c.style.display = "none";
   }
+}
+
+function showAllCards(cards) {
+  for (let i = 0; i < cards.length; i++) cards[i].style.display = "";
 }
 
 function getNameFromCard(card) {
@@ -404,24 +389,7 @@ function getSearchMatches(query) {
 
 function renderSearchSuggestions(container, matches) {
   for (let i = 0; i < matches.length; i++) {
-    const m = matches[i];
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "search-suggestion";
-    btn.textContent = `${m.name}`;
-    btn.dataset.id = m.id;
-    btn.addEventListener("click", () => {
-      const input = document.getElementById("searchInput");
-      if (input) input.value = m.name;
-      // Apply filter and update UI state so only matching cards remain
-      filterCardsByName(m.name);
-      // Update load more button state when search is active
-      updateLoadMoreButtonState();
-      container.innerHTML = "";
-      container.style.display = "none";
-      if (m.id) openDetailModalById(m.id);
-    });
-    container.appendChild(btn);
+    createSuggestionButton(matches[i], container);
   }
   container.style.display = "block";
 }
@@ -437,7 +405,6 @@ function updateLoadMoreButtonState() {
     loadBtn.disabled = true;
     loadBtn.classList.add("disabled-by-search");
   } else {
-    // show the button again when search cleared
     loadBtn.classList.remove("disabled-by-search");
     loadBtn.style.display = "";
     if (!isLoading) loadBtn.disabled = false;
@@ -464,21 +431,7 @@ async function initialLoad() {
 function setupLoadMoreButton() {
   const loadBtn = document.getElementById("loadMoreBtn");
   if (!loadBtn) return;
-  async function onClickLoadMore() {
-    showMainSpinner();
-    setButtonLoading(loadBtn, true);
-    try {
-      await loadAndRenderPage();
-      await new Promise((res) => setTimeout(res, PRELOADER_MS));
-    } catch (e) {
-      console.warn("load more failed", e);
-    } finally {
-      setButtonLoading(loadBtn, false);
-      hideMainSpinner();
-    }
-  }
-
-  loadBtn.addEventListener("click", onClickLoadMore);
+  loadBtn.addEventListener("click", () => onClickLoadMore(loadBtn));
 }
 
 function ensureSuggestionElement(input) {
