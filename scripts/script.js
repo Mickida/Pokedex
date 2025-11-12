@@ -131,11 +131,13 @@ function addModalNavHandlers(root) {
   if (prevBtn)
     prevBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
+      if (prevBtn.disabled) return;
       navigateModal(-1);
     });
   if (nextBtn)
     nextBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
+      if (nextBtn.disabled) return;
       navigateModal(1);
     });
 }
@@ -234,7 +236,21 @@ function switchTab(tabName, root) {
 
 function getLoadedIds() {
   const cards = Array.from(document.querySelectorAll("#pokemonList .card"));
-  return cards.map((c) => parseInt(c.dataset.id, 10)).filter((n) => !isNaN(n));
+  // Only return ids of cards that are visible (not display:none)
+  return cards
+    .filter((c) => {
+      // check computed style so inline or stylesheet hiding both count
+      try {
+        const style = window.getComputedStyle(c);
+        return (
+          style && style.display !== "none" && style.visibility !== "hidden"
+        );
+      } catch (e) {
+        return true;
+      }
+    })
+    .map((c) => parseInt(c.dataset.id, 10))
+    .filter((n) => !isNaN(n));
 }
 
 function getCurrentModalId() {
@@ -397,6 +413,10 @@ function renderSearchSuggestions(container, matches) {
     btn.addEventListener("click", () => {
       const input = document.getElementById("searchInput");
       if (input) input.value = m.name;
+      // Apply filter and update UI state so only matching cards remain
+      filterCardsByName(m.name);
+      // Update load more button state when search is active
+      updateLoadMoreButtonState();
       container.innerHTML = "";
       container.style.display = "none";
       if (m.id) openDetailModalById(m.id);
@@ -404,6 +424,24 @@ function renderSearchSuggestions(container, matches) {
     container.appendChild(btn);
   }
   container.style.display = "block";
+}
+
+function updateLoadMoreButtonState() {
+  const loadBtn = document.getElementById("loadMoreBtn");
+  const input = document.getElementById("searchInput");
+  if (!loadBtn) return;
+  const hasQuery = input && (input.value || "").trim().length > 0;
+  const isLoading = !!loadBtn.classList.contains("loading") || loadBtn.disabled;
+  if (hasQuery) {
+    loadBtn.style.display = "none";
+    loadBtn.disabled = true;
+    loadBtn.classList.add("disabled-by-search");
+  } else {
+    // show the button again when search cleared
+    loadBtn.classList.remove("disabled-by-search");
+    loadBtn.style.display = "";
+    if (!isLoading) loadBtn.disabled = false;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -477,6 +515,7 @@ function configureSearchInput(input, header) {
     const q = ev.target.value || "";
     filterCardsByName(q);
     showSearchSuggestions(q);
+    updateLoadMoreButtonState();
   });
   document.addEventListener("click", (ev) => {
     if (ev.target === input) return;
@@ -491,6 +530,17 @@ function setupSearch() {
   const input = document.getElementById("searchInput");
   if (!input || !header) return;
   configureSearchInput(input, header);
+  updateLoadMoreButtonState();
+
+  try {
+    const brand = header.querySelector(".header__brand");
+    if (brand) {
+      brand.style.cursor = "pointer";
+      brand.addEventListener("click", () => {
+        window.location.reload();
+      });
+    }
+  } catch (e) {}
 }
 
 async function initApp() {

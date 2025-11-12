@@ -14,7 +14,6 @@
 .card {
   background: #07262a;
   border-radius: 8px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: stretch;

@@ -109,11 +109,6 @@ footer {
 }
 
 @media (max-width: 320px) {
-  html,
-  body {
-    overflow-x: hidden;
-  }
-
   header {
     padding: 8px 10px;
     align-items: center;
