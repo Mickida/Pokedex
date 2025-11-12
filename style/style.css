@@ -7,6 +7,12 @@ body {
   color: #fff;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 header {
   position: sticky;
   top: 0;
@@ -100,4 +106,154 @@ footer {
 }
 .search-suggestion:active {
   background: rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 320px) {
+  /* Prevent accidental horizontal overflow */
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  header {
+    padding: 8px 10px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header__brand .header__pokeball {
+    width: 28px;
+    height: 28px;
+  }
+  .header__title {
+    font-size: 20px;
+  }
+
+  /* Make search input flexible and avoid forcing width */
+  .header__search {
+    min-width: 0;
+    max-width: 160px;
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .main-body {
+    padding: 12px 10px 90px;
+  }
+
+  /* Card list -> single column-ish, no overflow */
+  #pokemonList {
+    gap: 12px;
+    padding: 10px;
+    justify-content: center;
+  }
+
+  .card {
+    flex: 0 1 calc(100% - 32px);
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .card__media {
+    padding: 8px;
+    min-height: 90px;
+  }
+  .card__media img {
+    max-width: 100%;
+    height: auto;
+    max-height: 140px;
+  }
+
+  .card__body {
+    padding: 8px;
+  }
+
+  .card__name {
+    font-size: 16px;
+  }
+  .card__id {
+    font-size: 16px;
+    left: 8px;
+    top: 6px;
+  }
+
+  .load-more {
+    min-width: 140px;
+    padding: 10px 16px;
+  }
+
+  /* Modal: use viewport percentages so it never overflows */
+  .modal-card {
+    width: 92vw;
+    max-width: 92vw;
+    height: 88vh;
+    max-height: 88vh;
+  }
+  .modal-nav {
+    top: auto;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .top-inner .detail-image-wrap {
+    width: 96px;
+    height: 96px;
+    top: 56px;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-row {
+    grid-template-columns: 1fr 36px;
+  }
+
+  /* Suggestions box should not overflow the viewport */
+  .search-suggestions {
+    min-width: 140px;
+    left: 8px;
+    right: 8px;
+    width: auto;
+  }
+}
+
+@media (max-width: 440px) {
+  header {
+    /* allow items to wrap instead of being squished horizontally */
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header__brand {
+    /* keep brand on its own line when necessary but allow space */
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header__title {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .header__search {
+    /* allow the input to shrink and wrap but keep its visual form */
+    flex: 1 1 100%;
+    min-width: 0; /* important to allow flex children to shrink */
+    max-width: 100%;
+    width: 100%;
+    border-radius: 12px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+  }
+
+  /* reduce pokeball size a bit to give more room */
+  .header__pokeball {
+    width: 30px;
+    height: 30px;
+  }
 }

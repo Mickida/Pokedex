@@ -171,7 +171,7 @@
 
 .modal-nav {
   position: absolute;
-  top: 350px;
+  top: 360px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -213,6 +213,7 @@
   display: flex;
   gap: 12px;
   margin-bottom: 12px;
+  margin-top: 12px;
 }
 .detail-tabs [role="tab"] {
   background: transparent;
@@ -290,29 +291,32 @@
   background: #7038f8;
 }
 
-@media (max-width: 420px) {
-  .modal-card {
-    width: 320px;
-    height: 520px;
+@media (max-width: 320px) {
+  .detail-content {
+    padding: 12px;
   }
-  .top-inner .detail-image-wrap {
-    width: 120px;
-    height: 120px;
-    top: 72px;
-  }
-  .detail-tabs {
-    margin-top: 64px;
-  }
-}
 
-@media (max-width: 420px) {
-  .modal-card {
-    width: 320px;
-    height: 520px;
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 6px 12px;
+    padding-top: 12px;
   }
-  .top-inner .detail-image-wrap {
-    width: 120px;
-    height: 120px;
-    top: 80px;
+
+  .stat-label {
+    font-size: 14px;
+  }
+  .stat-value {
+    font-size: 14px;
+  }
+  .stat-row {
+    grid-template-columns: 1fr 40px;
+    margin: 8px 0;
+  }
+  .stat-bar {
+    height: 3px;
+  }
+
+  .detail-tabs {
+    margin-bottom: 8px;
   }
 }
