@@ -1,9 +1,7 @@
 let uiOffset = 0;
 const uiLimit = 20;
+const PRELOADER_MS = 2500;
 
-// ---------------------
-// Utilities
-// ---------------------
 function capitalize(str) {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -26,76 +24,120 @@ function createTypeBadge(typeName) {
   return span;
 }
 
+function cloneCardTemplate() {
+  const tpl = document.getElementById("card-tpl");
+  if (!tpl) return null;
+  const node = tpl.content.cloneNode(true);
+  return node.querySelector(".card");
+}
+
+function fillCardFields(article, pokemonSummary) {
+  article.dataset.id = pokemonSummary.id;
+  const idEl = article.querySelector(".card__id");
+  if (idEl) idEl.textContent = `#${pokemonSummary.id}`;
+  const nameEl = article.querySelector(".card__name");
+  if (nameEl) nameEl.textContent = capitalize(pokemonSummary.name) || "";
+  const img = article.querySelector(".card__img");
+  if (img) {
+    img.src = pokemonSummary.image || "";
+    img.alt = capitalize(pokemonSummary.name) || "";
+  }
+  const badges = article.querySelector(".type-badges");
+  if (badges) badges.dataset.id = pokemonSummary.id;
+}
+
+function attachCardClick(article, id) {
+  article.addEventListener("click", (e) => {
+    if (e.target && e.target.closest(".type-badges")) return;
+    openDetailModalById(id);
+  });
+}
+
 function applyCardTypeStyle(cardElement, primaryType) {
   const toRemove = [];
-  cardElement.classList.forEach((c) => {
+  for (let i = 0; i < cardElement.classList.length; i++) {
+    const c = cardElement.classList[i];
     if (c.startsWith("type-")) toRemove.push(c);
-  });
-  toRemove.forEach((c) => cardElement.classList.remove(c));
+  }
+  for (let i = 0; i < toRemove.length; i++) {
+    cardElement.classList.remove(toRemove[i]);
+  }
   if (primaryType) cardElement.classList.add(`type-${primaryType}`);
 }
 
-// ---------------------
-// Card rendering
-// ---------------------
 function createPokemonCard(pokemonSummary) {
-  const article = document.createElement("article");
-  article.className = "card";
-  article.dataset.id = pokemonSummary.id;
-  article.addEventListener("click", (e) => {
-    if (e.target && e.target.closest(".type-badges")) return;
-    openDetailModalById(pokemonSummary.id);
-  });
+  const article = cloneCardTemplate();
+  if (!article) return renderCardFallback(pokemonSummary);
+  fillCardFields(article, pokemonSummary);
+  attachCardClick(article, pokemonSummary.id);
+  return article;
+}
+
+function renderCardFallback(pokemonSummary) {
+  const fallback = document.createElement("article");
+  fallback.className = "card";
+  fallback.dataset.id = pokemonSummary.id;
+  attachCardClick(fallback, pokemonSummary.id);
   const rendered = window.templates.renderCard({
     id: pokemonSummary.id,
     image: pokemonSummary.image,
     name: capitalize(pokemonSummary.name),
   });
-  article.innerHTML = rendered;
-  return article;
+  fallback.innerHTML = rendered;
+  return fallback;
 }
 
-// ---------------------
-// Modal / detail view
-// ---------------------
 function buildModalIfNeeded() {
   const root = document.getElementById("detailModal");
   if (!root) return null;
   if (root.dataset.built) return root;
   root.setAttribute("aria-hidden", "true");
-  root.innerHTML = window.templates.renderModal();
-
+  renderModalContent(root);
+  addModalCloseHandlers(root);
+  addModalTabHandlers(root);
+  addModalNavHandlers(root);
   root.dataset.built = "1";
+  return root;
+}
 
-  root.querySelector(".modal-close").addEventListener("click", closeModal);
+function renderModalContent(root) {
+  root.innerHTML = window.templates.renderModal();
+}
+
+function addModalCloseHandlers(root) {
+  const close = root.querySelector(".modal-close");
+  if (close) close.addEventListener("click", closeModal);
   root.addEventListener("click", (ev) => {
     if (ev.target === root) closeModal();
   });
   document.addEventListener("keydown", (ev) => {
     if (ev.key === "Escape") closeModal();
   });
+}
 
+function addModalTabHandlers(root) {
   const tablist = root.querySelector(".detail-tabs");
+  if (!tablist) return;
   tablist.addEventListener("click", (ev) => {
     const btn = ev.target.closest('[role="tab"]');
     if (!btn) return;
     switchTab(btn.dataset.tab, root);
   });
+}
 
+function addModalNavHandlers(root) {
   const prevBtn = root.querySelector(".nav-prev");
   const nextBtn = root.querySelector(".nav-next");
-  if (prevBtn && nextBtn) {
+  if (prevBtn)
     prevBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
       navigateModal(-1);
     });
+  if (nextBtn)
     nextBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
       navigateModal(1);
     });
-  }
-
-  return root;
 }
 
 async function openDetailModalById(id) {
@@ -112,14 +154,27 @@ function showModal(detail) {
   if (!root) return;
   root.classList.add("open");
   root.setAttribute("aria-hidden", "false");
+  root.dataset.currentId = detail.id;
+  setModalHeader(root, detail);
+  populateModalBadges(root, detail);
+  populateModalPanels(root, detail);
+  updateNavButtons(root);
+  const close = root.querySelector(".modal-close");
+  if (close) close.focus();
+}
 
+function setModalHeader(root, detail) {
   const card = root.querySelector(".modal-card");
-  root.querySelector("#modalTitle").textContent = capitalize(detail.name);
-  root.querySelector(".id-wrap").textContent = `#${detail.id}`;
+  if (!card) return;
+  const title = root.querySelector("#modalTitle");
+  if (title) title.textContent = capitalize(detail.name);
+  const idWrap = root.querySelector(".id-wrap");
+  if (idWrap) idWrap.textContent = `#${detail.id}`;
   const img = root.querySelector(".detail-image");
-  img.src = detail.image || "";
-  img.alt = capitalize(detail.name) || "";
-
+  if (img) {
+    img.src = detail.image || "";
+    img.alt = capitalize(detail.name) || "";
+  }
   const primaryType =
     detail.types &&
     detail.types[0] &&
@@ -129,22 +184,22 @@ function showModal(detail) {
       : null;
   card.className = "modal-card";
   if (primaryType) card.classList.add(`type-${primaryType}`);
+}
 
+function populateModalBadges(root, detail) {
   const topBadges = root.querySelector(".modal-type-badges");
+  if (!topBadges) return;
   topBadges.innerHTML = "";
-  (detail.types || []).forEach((t) =>
-    topBadges.appendChild(createTypeBadge(t.type.name))
-  );
+  const detailTypes = detail.types || [];
+  for (let i = 0; i < detailTypes.length; i++)
+    topBadges.appendChild(createTypeBadge(detailTypes[i].type.name));
+}
 
-  updateNavButtons(root);
-
+function populateModalPanels(root, detail) {
   const overview = root.querySelector('[data-panel="overview"]');
-  overview.innerHTML = window.templates.renderOverview(detail);
-
+  if (overview) overview.innerHTML = window.templates.renderOverview(detail);
   const stats = root.querySelector('[data-panel="stats"]');
-  stats.innerHTML = window.templates.renderStats(detail);
-
-  root.querySelector(".modal-close").focus();
+  if (stats) stats.innerHTML = window.templates.renderStats(detail);
 }
 
 function closeModal() {
@@ -152,22 +207,29 @@ function closeModal() {
   if (!root) return;
   root.classList.remove("open");
   root.setAttribute("aria-hidden", "true");
+  try {
+    delete root.dataset.currentId;
+  } catch (e) {
+    root.dataset.currentId = "";
+  }
 }
 
 function switchTab(tabName, root) {
   if (!root) root = document.getElementById("detailModal");
   const tabs = root.querySelectorAll('[role="tab"]');
-  tabs.forEach((t) =>
+  for (let i = 0; i < tabs.length; i++) {
+    const t = tabs[i];
     t.setAttribute(
       "aria-selected",
       t.dataset.tab === tabName ? "true" : "false"
-    )
-  );
+    );
+  }
   const panels = root.querySelectorAll('[role="tabpanel"]');
-  panels.forEach((p) => {
+  for (let i = 0; i < panels.length; i++) {
+    const p = panels[i];
     if (p.dataset.panel === tabName) p.removeAttribute("hidden");
     else p.setAttribute("hidden", "");
-  });
+  }
 }
 
 function getLoadedIds() {
@@ -177,69 +239,70 @@ function getLoadedIds() {
 
 function getCurrentModalId() {
   const root = document.getElementById("detailModal");
-  if (!root) return null;
-  const idWrap = root.querySelector(".id-wrap");
-  if (!idWrap) return null;
-  const txt = (idWrap.textContent || "").replace("#", "").trim();
-  const n = parseInt(txt, 10);
+  if (!root || !root.dataset.currentId) return null;
+  const n = parseInt(root.dataset.currentId, 10);
   return isNaN(n) ? null : n;
 }
 
 function navigateModal(offset) {
   const ids = getLoadedIds();
   if (!ids.length) return;
-  const current = getCurrentModalId();
-  const idx = ids.indexOf(current);
-  if (idx === -1) return;
-  const target = ids[idx + offset];
-  if (typeof target !== "undefined") {
-    openDetailModalById(target);
-  }
+  const idx = ids.indexOf(getCurrentModalId());
+  const next = ids[idx + offset];
+  if (typeof next !== "undefined") openDetailModalById(next);
 }
 
 function updateNavButtons(root) {
-  if (!root) root = document.getElementById("detailModal");
-  const prevBtn = root.querySelector(".nav-prev");
-  const nextBtn = root.querySelector(".nav-next");
+  root = root || document.getElementById("detailModal");
+  const prev = root.querySelector(".nav-prev");
+  const next = root.querySelector(".nav-next");
   const ids = getLoadedIds();
-  const current = getCurrentModalId();
-  const idx = ids.indexOf(current);
-  if (prevBtn) prevBtn.disabled = idx <= 0;
-  if (nextBtn) nextBtn.disabled = idx === -1 || idx >= ids.length - 1;
+  const idx = ids.indexOf(getCurrentModalId());
+  if (prev) prev.disabled = idx <= 0;
+  if (next) next.disabled = idx < 0 || idx >= ids.length - 1;
 }
 
-// ---------------------
-// Data loading / enrichment
-// ---------------------
 async function enrichCardWithTypes(cardElement, pokemonId) {
   try {
-    const detail = await pokeApi.getPokemonById(pokemonId);
+    const types = await fetchTypesForPokemon(pokemonId);
     const badges = cardElement.querySelector(".type-badges");
+    if (!badges) return;
     badges.innerHTML = "";
-
-    const types = (detail.types || []).map((t) => t.type.name);
-    types.forEach((typeName) => badges.appendChild(createTypeBadge(typeName)));
-
+    appendBadges(badges, types);
     if (types.length > 0) applyCardTypeStyle(cardElement, types[0]);
   } catch (e) {
     console.warn("type load failed", e);
   }
 }
 
+async function fetchTypesForPokemon(pokemonId) {
+  const detail = await pokeApi.getPokemonById(pokemonId);
+  const types = detail.types || [];
+  const result = [];
+  for (let i = 0; i < types.length; i++) {
+    const t = types[i];
+    result.push(t.type.name);
+  }
+  return result;
+}
+
+function appendBadges(badgesEl, types) {
+  for (let i = 0; i < types.length; i++)
+    badgesEl.appendChild(createTypeBadge(types[i]));
+}
+
 async function loadAndRenderPage() {
   const container = document.getElementById("pokemonList");
   const list = await pokeApi.getPokemonList(uiOffset, uiLimit);
-  list.forEach((s) => {
+  for (let i = 0; i < list.length; i++) {
+    const s = list[i];
     const card = createPokemonCard(s);
     container.appendChild(card);
     enrichCardWithTypes(card, s.id);
-  });
+  }
   uiOffset += uiLimit;
 }
 
-// ---------------------
-// Spinner / loading helpers
-// ---------------------
 function showMainSpinner() {
   const g = document.getElementById("mainSpinner");
   if (!g) return;
@@ -265,11 +328,6 @@ function setButtonLoading(btn, isLoading) {
   }
 }
 
-const PRELOADER_MS = 2500;
-
-// ---------------------
-// Search / filtering helpers
-// ---------------------
 function getRenderedCards() {
   const container = document.getElementById("pokemonList");
   if (!container) return [];
@@ -280,15 +338,18 @@ function filterCardsByName(q) {
   const query = (q || "").trim().toLowerCase();
   const cards = getRenderedCards();
   if (!query) {
-    cards.forEach((c) => (c.style.display = ""));
+    for (let i = 0; i < cards.length; i++) {
+      cards[i].style.display = "";
+    }
     return;
   }
-  cards.forEach((c) => {
+  for (let i = 0; i < cards.length; i++) {
+    const c = cards[i];
     const nameEl = c.querySelector(".card__name");
     const name = nameEl ? (nameEl.textContent || "").toLowerCase() : "";
     if (name.includes(query)) c.style.display = "";
     else c.style.display = "none";
-  });
+  }
 }
 
 function getNameFromCard(card) {
@@ -305,27 +366,35 @@ function showSearchSuggestions(q) {
     container.style.display = "none";
     return;
   }
-  const cards = getRenderedCards();
-  const matches = cards
-    .map((c) => ({
-      id: c.dataset.id,
-      name: getNameFromCard(c),
-    }))
-    .filter((p) => p.name.toLowerCase().includes(query))
-    .slice(0, 8);
-
+  const matches = getSearchMatches(query).slice(0, 8);
   if (!matches.length) {
     container.style.display = "none";
     return;
   }
+  renderSearchSuggestions(container, matches);
+}
 
-  matches.forEach((m) => {
+function getSearchMatches(query) {
+  const cards = getRenderedCards();
+  const matches = [];
+  for (let i = 0; i < cards.length; i++) {
+    const c = cards[i];
+    const name = getNameFromCard(c);
+    if (name.toLowerCase().includes(query))
+      matches.push({ id: c.dataset.id, name });
+  }
+  return matches;
+}
+
+function renderSearchSuggestions(container, matches) {
+  for (let i = 0; i < matches.length; i++) {
+    const m = matches[i];
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "search-suggestion";
     btn.textContent = `${m.name}`;
     btn.dataset.id = m.id;
-    btn.addEventListener("click", (ev) => {
+    btn.addEventListener("click", () => {
       const input = document.getElementById("searchInput");
       if (input) input.value = m.name;
       container.innerHTML = "";
@@ -333,15 +402,15 @@ function showSearchSuggestions(q) {
       if (m.id) openDetailModalById(m.id);
     });
     container.appendChild(btn);
-  });
+  }
   container.style.display = "block";
 }
 
-// ---------------------
-// DOM Ready: initialize loader, buttons and search
-// ---------------------
-document.addEventListener("DOMContentLoaded", async () => {
-  // Initial loader + first page
+document.addEventListener("DOMContentLoaded", () => {
+  initApp();
+});
+
+async function initialLoad() {
   showMainSpinner();
   try {
     const loadPromise = loadAndRenderPage();
@@ -352,32 +421,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   } finally {
     hideMainSpinner();
   }
+}
 
-  // Load more button
+function setupLoadMoreButton() {
   const loadBtn = document.getElementById("loadMoreBtn");
-  if (loadBtn) {
-    loadBtn.addEventListener("click", async (ev) => {
-      try {
-        showMainSpinner();
-        setButtonLoading(loadBtn, true);
-        const timerPromise = new Promise((res) =>
-          setTimeout(res, PRELOADER_MS)
-        );
-        await Promise.all([loadAndRenderPage(), timerPromise]);
-      } catch (e) {
-        console.warn("load more failed", e);
-      } finally {
-        setButtonLoading(loadBtn, false);
-        hideMainSpinner();
-      }
-    });
+  if (!loadBtn) return;
+  async function onClickLoadMore() {
+    showMainSpinner();
+    setButtonLoading(loadBtn, true);
+    try {
+      await loadAndRenderPage();
+      await new Promise((res) => setTimeout(res, PRELOADER_MS));
+    } catch (e) {
+      console.warn("load more failed", e);
+    } finally {
+      setButtonLoading(loadBtn, false);
+      hideMainSpinner();
+    }
   }
 
-  // Search input & suggestions setup
-  const header = document.querySelector("header");
-  const input = document.getElementById("searchInput");
-  if (!input || !header) return;
+  loadBtn.addEventListener("click", onClickLoadMore);
+}
 
+function ensureSuggestionElement(input) {
   let sug = document.getElementById("searchSuggestions");
   if (!sug) {
     sug = document.createElement("div");
@@ -385,36 +451,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     sug.className = "search-suggestions";
     input.insertAdjacentElement("afterend", sug);
   }
+  return sug;
+}
 
-  function positionSuggestions() {
+function configureSuggestionPositioning(header, input, sug) {
+  function position() {
     const rect = input.getBoundingClientRect();
     const headerRect = header.getBoundingClientRect();
-    const left = rect.left - headerRect.left;
-    const top = rect.top - headerRect.top + input.offsetHeight + 6;
-    sug.style.left = left + "px";
-    sug.style.top = top + "px";
+    sug.style.left = rect.left - headerRect.left + "px";
+    sug.style.top = rect.top - headerRect.top + input.offsetHeight + 6 + "px";
     sug.style.width = Math.max(0, Math.round(rect.width)) + "px";
   }
+  position();
+  window.addEventListener("resize", position);
+  window.addEventListener("orientationchange", position);
+  input.addEventListener("focus", position);
+}
 
-  positionSuggestions();
-  window.addEventListener("resize", positionSuggestions);
-  window.addEventListener("orientationchange", positionSuggestions);
-  input.addEventListener("focus", positionSuggestions);
-
+function configureSearchInput(input, header) {
+  const sug = ensureSuggestionElement(input);
+  configureSuggestionPositioning(header, input, sug);
   input.setAttribute("aria-autocomplete", "list");
   input.setAttribute("aria-controls", "searchSuggestions");
-
   input.addEventListener("input", (ev) => {
     const q = ev.target.value || "";
     filterCardsByName(q);
     showSearchSuggestions(q);
   });
-
   document.addEventListener("click", (ev) => {
-    if (!sug) return;
     if (ev.target === input) return;
     if (ev.target.closest && ev.target.closest("#searchSuggestions")) return;
     sug.innerHTML = "";
     sug.style.display = "none";
   });
-});
+}
+
+function setupSearch() {
+  const header = document.querySelector("header");
+  const input = document.getElementById("searchInput");
+  if (!input || !header) return;
+  configureSearchInput(input, header);
+}
+
+async function initApp() {
+  await initialLoad();
+  setupLoadMoreButton();
+  setupSearch();
+}

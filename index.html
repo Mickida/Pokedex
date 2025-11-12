@@ -40,6 +40,20 @@
             <img src="./icons/pokeball.svg" alt="loading" class="spinner-img" />
           </div>
         </div>
+        <template id="card-tpl">
+          <article class="card" data-id="">
+            <div class="card__header">
+              <span class="card__id"></span>
+              <h3 class="card__name"></h3>
+            </div>
+            <div class="card__media">
+              <img class="card__img" src="" alt="" />
+            </div>
+            <div class="card__body">
+              <div class="type-badges"></div>
+            </div>
+          </article>
+        </template>
 
         <section class="pokemon-list" id="pokemonList"></section>
 
