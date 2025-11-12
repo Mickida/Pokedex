@@ -201,14 +201,6 @@
   transform: translateY(0);
 }
 
-@media (max-width: 420px) {
-  .nav-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-  }
-}
-
 .detail-tabs {
   display: flex;
   gap: 12px;
@@ -289,6 +281,14 @@
 }
 .modal-card.type-dragon .card-top {
   background: #7038f8;
+}
+
+@media (max-width: 420px) {
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
 }
 
 @media (max-width: 320px) {
