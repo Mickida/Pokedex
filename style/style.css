@@ -109,7 +109,6 @@ footer {
 }
 
 @media (max-width: 320px) {
-  /* Prevent accidental horizontal overflow */
   html,
   body {
     overflow-x: hidden;
@@ -129,7 +128,6 @@ footer {
     font-size: 20px;
   }
 
-  /* Make search input flexible and avoid forcing width */
   .header__search {
     min-width: 0;
     max-width: 160px;
@@ -142,7 +140,6 @@ footer {
     padding: 12px 10px 90px;
   }
 
-  /* Card list -> single column-ish, no overflow */
   #pokemonList {
     gap: 12px;
     padding: 10px;
@@ -183,7 +180,6 @@ footer {
     padding: 10px 16px;
   }
 
-  /* Modal: use viewport percentages so it never overflows */
   .modal-card {
     width: 92vw;
     max-width: 92vw;
@@ -210,7 +206,6 @@ footer {
     grid-template-columns: 1fr 36px;
   }
 
-  /* Suggestions box should not overflow the viewport */
   .search-suggestions {
     min-width: 140px;
     left: 8px;
@@ -221,14 +216,12 @@ footer {
 
 @media (max-width: 440px) {
   header {
-    /* allow items to wrap instead of being squished horizontally */
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
   }
 
   .header__brand {
-    /* keep brand on its own line when necessary but allow space */
     flex: 0 0 auto;
     display: flex;
     align-items: center;
@@ -241,9 +234,8 @@ footer {
   }
 
   .header__search {
-    /* allow the input to shrink and wrap but keep its visual form */
     flex: 1 1 100%;
-    min-width: 0; /* important to allow flex children to shrink */
+    min-width: 0;
     max-width: 100%;
     width: 100%;
     border-radius: 12px;
@@ -251,7 +243,6 @@ footer {
     box-sizing: border-box;
   }
 
-  /* reduce pokeball size a bit to give more room */
   .header__pokeball {
     width: 30px;
     height: 30px;
