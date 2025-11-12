@@ -306,14 +306,12 @@ async function loadAndRenderPage() {
 function showMainSpinner() {
   const g = document.getElementById("mainSpinner");
   if (!g) return;
-  console.log("showMainSpinner: showing main spinner");
   g.setAttribute("aria-hidden", "false");
   g.style.display = "flex";
 }
 function hideMainSpinner() {
   const g = document.getElementById("mainSpinner");
   if (!g) return;
-  console.log("hideMainSpinner: hiding main spinner");
   g.setAttribute("aria-hidden", "true");
   g.style.display = "none";
 }

@@ -22,7 +22,7 @@ async function getPokemonList(offset = 0, limit = 20) {
   });
 }
 
-async function getPokemon(idOrName) {
+async function getPokemonById(idOrName) {
   const pokemonData = await loadData(`/pokemon/${idOrName}`);
   const officialArtworkUrl =
     pokemonData.sprites?.other?.["official-artwork"]?.front_default;
@@ -36,16 +36,11 @@ async function getPokemon(idOrName) {
     abilities: pokemonData.abilities,
     height: pokemonData.height,
     weight: pokemonData.weight,
-    moves: pokemonData.moves,
     species: pokemonData.species,
   };
 }
 
-function getPokemonById(id) {
-  return getPokemon(id);
-}
 window.pokeApi = {
   getPokemonList,
   getPokemonById,
-  getPokemon,
 };
