@@ -179,8 +179,13 @@ footer {
     width: 92vw;
     max-width: 92vw;
     height: 88vh;
-    max-height: 88vh;
+    max-height: 80vh;
   }
+
+  .modal-type-badges {
+    gap: 4px;
+  }
+
   .modal-nav {
     top: auto;
     bottom: 16px;
