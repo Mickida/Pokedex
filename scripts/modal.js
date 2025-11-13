@@ -96,9 +96,15 @@ function populateModalBadges(root, detail) {
 
 function populateModalPanels(root, detail) {
   const overview = root.querySelector('[data-panel="overview"]');
-  if (overview) overview.innerHTML = window.templates.renderOverview(detail);
+  if (overview) {
+    const overviewData = buildOverviewData(detail);
+    overview.innerHTML = window.templates.renderOverview(overviewData);
+  }
   const stats = root.querySelector('[data-panel="stats"]');
-  if (stats) stats.innerHTML = window.templates.renderStats(detail);
+  if (stats) {
+    const statsHtml = buildStatsHtml(detail);
+    stats.innerHTML = window.templates.renderStats(statsHtml);
+  }
 }
 
 function closeModal() {

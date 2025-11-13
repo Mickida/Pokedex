@@ -17,6 +17,41 @@ function setModalImageTitleId(root, detail) {
   }
 }
 
+function buildOverviewData(detail) {
+  const speciesName =
+    detail && detail.species && detail.species.name ? detail.species.name : "-";
+  const abilities = (detail && detail.abilities ? detail.abilities : [])
+    .map((a) => (a && a.ability && a.ability.name ? a.ability.name : ""))
+    .filter((n) => n)
+    .join(", ");
+  return {
+    speciesName: speciesName,
+    height: detail && typeof detail.height !== "undefined" ? detail.height : "",
+    weight: detail && typeof detail.weight !== "undefined" ? detail.weight : "",
+    abilities: abilities,
+  };
+}
+
+function buildStatsHtml(detail) {
+  const maxStat = 160;
+  const stats = (detail && detail.stats) || [];
+  return stats
+    .map((s) => {
+      const name = s && s.stat && s.stat.name ? s.stat.name : "";
+      const val = s && typeof s.base_stat !== "undefined" ? s.base_stat : 0;
+      const pct = Math.min(100, Math.round((val / maxStat) * 100));
+      return `
+            <div class="stat-row">
+                <div class="stat-label">${name}</div>
+                <div class="stat-value">${val}</div>
+                <div class="stat-bar">
+                    <div class="stat-fill" style="width:${pct}%"></div>
+                </div>
+            </div>`;
+    })
+    .join("");
+}
+
 function showAllCards(cards) {
   for (let i = 0; i < cards.length; i++) cards[i].style.display = "";
 }

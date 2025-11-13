@@ -77,8 +77,8 @@ function renderCardFallback(pokemonSummary) {
   attachCardClick(fallback, pokemonSummary.id);
   const rendered = window.templates.renderCard({
     id: pokemonSummary.id,
-    image: pokemonSummary.image,
-    name: capitalize(pokemonSummary.name),
+    image: pokemonSummary.image || "",
+    name: pokemonSummary.name ? capitalize(pokemonSummary.name) : "",
   });
   fallback.innerHTML = rendered;
   return fallback;

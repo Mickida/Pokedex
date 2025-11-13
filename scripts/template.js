@@ -1,15 +1,13 @@
 function renderCard(pokemonSummary) {
   return `
-        <div class="card__header">
-            <span class="card__id">#${pokemonSummary.id}</span>
-                    <h3 class="card__name">${pokemonSummary.name || ""}</h3>
-                </div>
-                <div class="card__media"><img src="${
-                  pokemonSummary.image
-                }" alt="${pokemonSummary.name || ""}"></div>
-        <div class="card__body">
-            <div class="type-badges" data-id="${pokemonSummary.id}"></div>
-        </div>`;
+                <div class="card__header">
+                        <span class="card__id">#${pokemonSummary.id}</span>
+                                        <h3 class="card__name">${pokemonSummary.name}</h3>
+                                </div>
+                                <div class="card__media"><img src="${pokemonSummary.image}" alt="${pokemonSummary.name}"></div>
+                <div class="card__body">
+                        <div class="type-badges" data-id="${pokemonSummary.id}"></div>
+                </div>`;
 }
 
 function renderModal() {
@@ -47,36 +45,18 @@ function renderModal() {
         </div>`;
 }
 
-function renderOverview(detail) {
-  const speciesName = detail?.species?.name ? detail.species.name : "-";
-  const abilities = (detail.abilities || [])
-    .map((a) => a.ability.name)
-    .join(", ");
+function renderOverview(overview) {
   return `
-        <div class="about-grid">
-            <div><strong>Species</strong></div><div>${speciesName}</div>
-            <div><strong>Height</strong></div><div>${detail.height}</div>
-            <div><strong>Weight</strong></div><div>${detail.weight}</div>
-            <div><strong>Abilities</strong></div><div>${abilities}</div>
-        </div>`;
+                <div class="about-grid">
+                        <div><strong>Species</strong></div><div>${overview.speciesName}</div>
+                        <div><strong>Height</strong></div><div>${overview.height}</div>
+                        <div><strong>Weight</strong></div><div>${overview.weight}</div>
+                        <div><strong>Abilities</strong></div><div>${overview.abilities}</div>
+                </div>`;
 }
 
-function renderStats(detail) {
-  const maxStat = 160;
-  return (detail.stats || [])
-    .map((s) => {
-      const val = s.base_stat || 0;
-      const pct = Math.min(100, Math.round((val / maxStat) * 100));
-      return `
-            <div class="stat-row">
-                <div class="stat-label">${s.stat.name}</div>
-                <div class="stat-value">${val}</div>
-                <div class="stat-bar">
-                    <div class="stat-fill" style="width:${pct}%"></div>
-                </div>
-            </div>`;
-    })
-    .join("");
+function renderStats(statsHtml) {
+  return `${statsHtml}`;
 }
 
 window.templates = { renderCard, renderModal, renderOverview, renderStats };
