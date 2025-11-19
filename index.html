@@ -14,20 +14,22 @@
   <body>
     <main class="content">
       <header>
-        <div class="header__brand">
-          <img
-            class="header__pokeball"
-            src="./icons/pokeball.svg"
-            alt="pokéball"
+        <div class="header__inner">
+          <div class="header__brand">
+            <img
+              class="header__pokeball"
+              src="./icons/pokeball.svg"
+              alt="pokéball"
+            />
+            <h1 class="header__title">Pokedex</h1>
+          </div>
+          <input
+            type="text"
+            class="header__search"
+            id="searchInput"
+            placeholder="Search Pokémon..."
           />
-          <h1 class="header__title">Pokedex</h1>
         </div>
-        <input
-          type="text"
-          class="header__search"
-          id="searchInput"
-          placeholder="Search Pokémon..."
-        />
       </header>
 
       <div class="main-body">
@@ -57,13 +59,15 @@
       </div>
 
       <footer>
-        <p>&copy; 2023 Pokedex. All rights reserved.</p>
+        <div class="footer__inner">
+          <p>&copy; 2023 Pokedex. All rights reserved.</p>
+        </div>
       </footer>
     </main>
 
     <div id="detailModal" class="modal" aria-hidden="true"></div>
-  <script src="scripts/store.js" defer></script>
-  <script src="scripts/api.js" defer></script>
+    <script src="scripts/store.js" defer></script>
+    <script src="scripts/api.js" defer></script>
     <script src="scripts/template.js" defer></script>
     <script src="scripts/card.js" defer></script>
     <script src="scripts/modal.js" defer></script>
